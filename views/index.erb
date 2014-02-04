@@ -3,14 +3,12 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
       var getVacancies = function(str) {
-        $("ul").remove();
-        $('input').val = "";
-        $.getJSON("/jobs/"+str, function( data ) {
+        $.getJSON("/jobs/"+str, function( data ) { 
           var items = [];
           $.each( data, function(ind, vac ) {
             items.push("<li><a href='"+vac.url+"'>"+vac.title+"</a></br>"+vac.published+" "+vac.author+"</li>" );
           });
-         
+          $('.spinner').hide();         
           $("<ol/>", {
             "class": "my-new-list",
             html: items.join("")
@@ -19,9 +17,12 @@
       }
 
       $(document).ready(function(){
+        $('.spinner').hide();
         $("input").keypress(function(e) {
           if (e.which == 13) {
             e.preventDefault();
+            $('.spinner').show();
+            $('ol').remove();
             getVacancies(this.value);
           }
         })
@@ -35,9 +36,18 @@
       li {
         height: 50px;
       }
+      input {
+        height: 30px;
+        font-size: 17px;
+      }
+      img {
+        position: relative;
+        top:3px;
+      }
     </style>
   </head>
   <body>
-    <input type="text" id="search-field"></input>
+    <input type="text" id="search-field" size="60"></input>
+    <img src="/images/spinner.gif" class="spinner" width="18px;">
   </body>
 </html>

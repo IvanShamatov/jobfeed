@@ -2,7 +2,9 @@
 
 class Vacancy
   include ActionView::Helpers::DateHelper
+
   attr_accessor :title, :description, :url, :published, :author
+  
   def initialize(entity, link=nil)
     @title = entity.title
     @description = entity.summary 
@@ -30,7 +32,7 @@ class Vacancy
     {title: title,
      description: description,
      url: url,
-     published: time_ago_in_words(published),
+     published: time_ago_in_words(published)+" ago",
      author: author}
   end
 
@@ -38,6 +40,8 @@ end
 
 
 class App < Sinatra::Base
+
+  set :public_folder, 'public'
 
   get '/' do
     erb :index 
@@ -52,7 +56,7 @@ class App < Sinatra::Base
             "http://rss.superjob.ru/vacancy/search/?keywords[0][keys]=_WORD_",
             "http://itmozg.ru/search/vacancy?VacancySearchParams[keyword]=_WORD_&rss=true",
             "http://careers.stackoverflow.com/jobs/feed?searchTerm=_WORD_&allowsremote=True"]
-    urls.map! {|url| url.gsub!("_WORD_", params[:word])}
+    urls.map! {|url| url.gsub!("_WORD_", params[:word].gsub(" ","+"))}
     feeds = Feedzirra::Feed.fetch_and_parse(urls)
     jobs = []
     feeds.each do |link, feed|
