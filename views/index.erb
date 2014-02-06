@@ -6,7 +6,7 @@
         $.getJSON("/jobs/"+str, function( data ) { 
           var items = [];
           $.each( data, function(ind, vac ) {
-            items.push("<li><a href='"+vac.url+"'>"+vac.title+"</a></br>"+vac.published+" "+vac.author+"</li>" );
+            items.push("<li><a href='"+vac.url+"'>"+vac.title+"</a></br>"+vac.published+" "+vac.author+" "+vac.location+"</li>" );
           });
           $('.spinner').hide();         
           $("<ol/>", {

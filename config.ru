@@ -3,6 +3,7 @@ require 'action_view'
 require 'feedzirra'
 require 'json'
 require 'time'
+Dir[File.dirname(__FILE__) + '/lib/*.rb'].each {|file| require file }
 require './app'
 
-run App
+run JobFeed::App
