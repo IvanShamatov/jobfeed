@@ -36,6 +36,14 @@ module JobFeed
        author: author,
        location: location}
     end
+
+    def dump
+    	Marshal.dump(self)
+    end
+
+    def self.load(string)
+    	Marshal.load(string)
+    end
   end
 
 end

@@ -20,14 +20,10 @@ module JobFeed
 
     get '/jobs/:word' do 
       content_type :json
-      urls = ["http://rabota.mail.ru/rss/searchvacancy.xml?text=_WORD_"]
-      urls.map! {|url| url.gsub!("_WORD_", URI.escape(params[:word].gsub(" ","+")))}
-      feeds = Feedzirra::Feed.fetch_and_parse(urls)
+      params[:word] = URI.escape(params[:word].gsub(" ","+"))
       jobs = []
-      feeds.each do |link, feed|
-        if feed.respond_to?(:entries)
-          jobs << feed.entries.map{|e| Vacancy.new(e, link)}
-        end
+      if feed.respond_to?(:entries)
+        jobs << feed.entries.map{|e| Vacancy.new(e, "mail.ru")}
       end
       jobs.flatten!
       jobs.sort_by!(&:published).reverse!
@@ -35,5 +31,30 @@ module JobFeed
     end
 
 
+
+    def redis
+      @redis ||= Redis.new(path: "/tmp/redis.sock")
+    end
+
+
+
+    def feed
+      marshaled_feed = redis.get "keyword:#{params[:word]}"
+      if marshaled_feed.nil?
+        feed = Feedzirra::Feed.fetch_and_parse(feed_links)
+        redis.set "keyword:#{params[:word]}", Marshal.dump(feed)
+        feed        
+      else 
+        Marshal.load(marshaled_feed)
+      end
+    end
+
+
+
+    def feed_links
+      url = "http://rabota.mail.ru/rss/searchvacancy.xml?text=_WORD_"
+      url.gsub!("_WORD_", params[:word])
+    end
+ 
   end
 end
