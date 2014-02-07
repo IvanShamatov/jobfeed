@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 module JobFeed
   class App < Sinatra::Base
 
@@ -33,7 +34,7 @@ module JobFeed
 
 
     def redis
-      @redis ||= Redis.new(path: "/tmp/redis.sock")
+      JobFeed.redis
     end
 
 
@@ -52,8 +53,7 @@ module JobFeed
 
 
     def feed_links
-      url = "http://rabota.mail.ru/rss/searchvacancy.xml?text=_WORD_"
-      url.gsub!("_WORD_", params[:word])
+      "http://rabota.mail.ru/rss/searchvacancy.xml?text=#{params[:word]}"
     end
  
   end
