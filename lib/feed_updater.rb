@@ -10,11 +10,15 @@ module JobFeed
     def self.run
       feeds = get_feeds
       EM::Iterator.new(feeds, 10).each do |feed, iter|
-        feed = Marshal.load(feed)
+        word = feed[0]
+        feed = Marshal.load(feed[1])
         feed = Feedzirra::Feed.update(feed)
         if feed.updated?
           counter = feed.new_entries.count
-          # redis.publish ("push_notification", [feed, counter])
+          redis.set word, feed
+          word.gsub!("keyword:","")
+          word.gsub!(":feed","")
+          redis.publish ("push_notification", Marshal.dump([word, counter]))
         end
         puts "feed #{feed.feed_url} executed"
         iter.next
@@ -24,8 +28,9 @@ module JobFeed
 
 
     def self.get_feeds
-      keys = redis.keys("keyword:*")
+      keys = redis.keys("keyword:*:feed")
       feeds = redis.mget keys
+      keys.zip(feeds)
     end
 
 

@@ -43,7 +43,8 @@ module JobFeed
       marshaled_feed = redis.get "keyword:#{params[:word]}"
       if marshaled_feed.nil?
         feed = Feedzirra::Feed.fetch_and_parse(feed_links)
-        redis.set "keyword:#{params[:word]}", Marshal.dump(feed)
+        redis.set "keyword:#{params[:word]}:feed", Marshal.dump(feed)
+        resis.sadd "keyword:#{params[:word]}:tokens", params[:token] unless params[:token].nil?
         feed        
       else 
         Marshal.load(marshaled_feed)

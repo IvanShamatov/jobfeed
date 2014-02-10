@@ -35,9 +35,7 @@ module JobFeed
     # Creating pubsub to subscribe on messages
     notifications = JobFeed.redis.pubsub
     notifications.subscribe("push_notification") do |message|
-      token = message[:token]
-      number = message[:number]
-      # here we will send push notification
+      Pusher.run(message)
     end
 
 
