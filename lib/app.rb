@@ -6,7 +6,7 @@ module JobFeed
     set :public_folder, 'public'
 
     get '/' do
-      erb :index 
+      erb :index
     end
 
 
@@ -34,7 +34,7 @@ module JobFeed
 
 
     def redis
-      JobFeed.redis
+      @redis = Redis.new(path: "/tmp/redis.sock")
     end
 
 

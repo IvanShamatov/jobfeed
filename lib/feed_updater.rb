@@ -28,7 +28,7 @@ module JobFeed
 
 
 
-    def get_feeds
+    def self.get_feeds
       keys = redis.keys("feed:*")
       feeds = redis.mget keys
     end
