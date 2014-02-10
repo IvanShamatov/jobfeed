@@ -11,32 +11,32 @@ module JobFeed
       feeds = get_feeds
       updater = Proc.new do
         feed = feeds.shift
-        if feed.nil?
-          return
-        else
+        unless feed.nil?
           feed = Marshal.load(feed)
-          feed.update
+          feed = Feedzirra::Feed.update(feed)
           if feed.updated?
             counter = feed.new_entries.count
             # redis.publish ("push_notification", [feed, counter])
           end
+          puts "feed #{feed.feed_url} executed"
           EM.next_tick &updater
         end
       end
       EM.next_tick &updater
+      puts "exit from updater"
     end
 
 
 
     def self.get_feeds
-      keys = redis.keys("feed:*")
+      keys = redis.keys("keyword:*")
       feeds = redis.mget keys
     end
 
 
 
     def self.redis
-      JobFeed.redis
+      @redis ||= Redis.new(path: "/tmp/redis.sock")
     end
   end
 end
