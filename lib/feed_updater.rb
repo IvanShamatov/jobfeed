@@ -9,21 +9,16 @@ module JobFeed
     # and push it in PubSub
     def self.run
       feeds = get_feeds
-      updater = Proc.new do
-        feed = feeds.shift
-        unless feed.nil?
-          feed = Marshal.load(feed)
-          feed = Feedzirra::Feed.update(feed)
-          if feed.updated?
-            counter = feed.new_entries.count
-            # redis.publish ("push_notification", [feed, counter])
-          end
-          puts "feed #{feed.feed_url} executed"
-          EM.next_tick &updater
+      EM::Iterator.new(feeds, 10).each do |feed, iter|
+        feed = Marshal.load(feed)
+        feed = Feedzirra::Feed.update(feed)
+        if feed.updated?
+          counter = feed.new_entries.count
+          # redis.publish ("push_notification", [feed, counter])
         end
+        puts "feed #{feed.feed_url} executed"
+        iter.next
       end
-      EM.next_tick &updater
-      puts "exit from updater"
     end
 
 
