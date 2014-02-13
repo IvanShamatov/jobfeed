@@ -40,7 +40,7 @@ module JobFeed
 
 
     def feed
-      marshaled_feed = redis.get "keyword:#{params[:word]}"
+      marshaled_feed = redis.get "keyword:#{params[:word]}:feed"
       if marshaled_feed.nil?
         feed = Feedzirra::Feed.fetch_and_parse(feed_links)
         redis.set "keyword:#{params[:word]}:feed", Marshal.dump(feed)

@@ -25,7 +25,7 @@ module JobFeed
     redis = JobFeed.redis
 
     # Starting WebServer mode
-    Thin::Server.start 3000, App # '/tmp/thin.sock', App
+    @web_server = Thin::Server.start 3000, App # '/tmp/thin.sock', App
 
     # Worker for updating feeds 
     EM.add_periodic_timer(60) do
@@ -38,6 +38,9 @@ module JobFeed
       Pusher.run(message)
     end
 
+    Signal.trap("INT") do
+      EM.stop
+    end
 
   end
 end

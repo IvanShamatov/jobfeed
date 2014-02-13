@@ -18,7 +18,7 @@ module JobFeed
           redis.set word, feed
           word.gsub!("keyword:","")
           word.gsub!(":feed","")
-          redis.publish ("push_notification", Marshal.dump([word, counter]))
+          redis.publis( "push_notification", Marshal.dump([word, counter]))
         end
         puts "feed #{feed.feed_url} executed"
         iter.next
